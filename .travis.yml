@@ -1,0 +1,32 @@
+# Travis Auto Builder for Project Gabriel Ver 1
+language: rust
+os:
+  - linux
+  - windows
+  - osx
+before_cache:
+  - rm -rf "$TRAVIS_HOME/.cargo/registry/src"
+cache: cargo
+install:
+  - git clone https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@gitlab.com/theprojectgabriel/client-release.git >/dev/null;
+  - git clone https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@gitlab.com/theprojectgabriel/gabriel-client.git >/dev/null;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then rustup target add i686-unknown-linux-musl; export target="i686-unknown-linux-musl"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then rustup target add i686-pc-windows-msvc; export target="i686-pc-windows-msvc"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then rustup target add x86_64-apple-darwin; export target="x86_64-apple-darwin"; fi
+script:
+  - cd gabriel-client;
+  - cargo test && cargo build --target ${target} && cargo build --target ${target} --release && cp target/debug/client ../client-release/client-${target}-debug && cp target/release/client ../client-release/client-${target}-release;
+  - export message=$(git log -1 --pretty=%B) && export git_commit_id=$(git rev-parse --short HEAD);
+  - cd ..;
+after_script:
+  - cd client-release;
+  - git config --local user.name "Project Gabriel";
+  - git config --local user.email "gabrielproject@protonmail.com";
+  - git pull;
+  - git add *;
+  - git commit -m "Travis Build";
+  - git remote set-url origin https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@gitlab.com/theprojectgabriel/client-release.git >/dev/null;
+  - git push -u origin master;
+  - cd ..;
+  - bash ./telegram.sh "${message}" "${git_commit_id}";
+  - rm -rf client-release gabriel-client;
