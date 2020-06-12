@@ -14,12 +14,12 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then rustup target add i686-pc-windows-msvc; export target="i686-pc-windows-msvc"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then rustup target add x86_64-apple-darwin; export target="x86_64-apple-darwin"; fi
 script:
-  - cd gabriel-client;
+  - cd core;
   - cargo test && cargo build --target ${target} && cargo build --target ${target} --release && for i in "client" "libshared.rlib" "manager" "proxy" "server"; do for j in "debug" "release"; do cp target/${target}/${j}/${i} ../core-builds/${i}-${target}-${j}; done; done;
   - export message=$(git log -1 --pretty=%B) && export git_commit_id=$(git rev-parse --short HEAD);
   - cd ..;
 after_script:
-  - cd client-release;
+  - cd core-builds;
   - git config --local user.name "Project Gabriel";
   - git config --local user.email "gabrielproject@protonmail.com";
   - git pull;
