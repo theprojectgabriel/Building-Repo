@@ -10,7 +10,7 @@ cache: cargo
 install:
   - git clone https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@gitlab.com/theprojectgabriel/core-builds.git >/dev/null;
   - git clone https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@gitlab.com/theprojectgabriel/core.git >/dev/null;
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then rustup target add i686-unknown-linux-musl; sudo apt-get install musl-tools clang; export target="i686-unknown-linux-musl"; export TARGET_CC=clang; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then rustup target add i686-unknown-linux-musl; sudo apt-get install musl-tools clang g++-multilib; export target="i686-unknown-linux-musl"; export TARGET_CC=clang; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then rustup target add i686-pc-windows-msvc; export target="i686-pc-windows-msvc"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then rustup target add x86_64-apple-darwin; export target="x86_64-apple-darwin"; fi
 script:
